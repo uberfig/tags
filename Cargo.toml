@@ -17,8 +17,9 @@ tokio-postgres = { version = "0.7.13", features = ["with-uuid-1"] }
 deadpool-postgres = "0.14.1"
 uuid = { version = "1.14.0", features = ["v7", "fast-rng"] }
 
-rsa = { version = "0.9.7", features = ["pem"] }
+rsa = { version = "0.9.7", features = ["pem", "sha2"] }
 ed25519-dalek = {version = "2.1.1", features = ["pkcs8", "rand_core", "serde", "pem"]}
 sha2 = "0.10.8"
 base64 = "0.22.1"
 rand = "0.8.5"
+pkcs8 = "0.10.2"

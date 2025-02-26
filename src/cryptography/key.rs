@@ -56,7 +56,7 @@ pub trait Key: Sized {
 
 pub trait PrivateKey: Key + Clone {
     /// sign the provided content with this key
-    fn sign(&mut self, content: &str) -> String;
+    fn sign(&mut self, content: &[u8]) -> String;
     // fn from_pem(pem: &str, algorithm: crate::cryptography::key::KeyType) -> Result<Self, ParseErr>;
     fn generate(algorithm: Algorithms) -> Self;
     // fn private_key_pem(&self) -> String;
