@@ -45,6 +45,17 @@ impl std::fmt::Display for Algorithms {
         }
     }
 }
+impl TryFrom<&str> for Algorithms {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "rsa-sha256" => Ok(Self::RsaSha256),
+            "hs2019" => Ok(Self::Hs2019),
+            _ => Err(()),
+        }
+    }
+}
 
 pub trait Key: Sized {
     /// Serialize from PEM

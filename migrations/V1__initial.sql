@@ -1,10 +1,16 @@
+CREATE TYPE algorithm AS ENUM ('rsa-sha256', 'hs2019');
+
 CREATE TABLE instances (
 	i_id			uuid NOT NULL PRIMARY KEY UNIQUE,
 	domain			TEXT NOT NULL UNIQUE,
 	blocked			BOOLEAN NOT NULL DEFAULT false,
 	reason			TEXT NULL,
-	allowlisted		BOOLEAN NOT NULL DEFAULT false
+	allowlisted		BOOLEAN NOT NULL DEFAULT false,
+	-- used to denote our instance
+	main			BOOLEAN NOT NULL DEFAULT false
 );
+create unique index on instances (main) 
+where main = true;
 
 CREATE TABLE users (
 	-- we will generate a uuid for all users
@@ -36,53 +42,52 @@ CREATE TABLE users (
 CREATE TABLE ap_instance_actor (
 	private_key_pem		TEXT NOT NULL,
 	public_key_pem		TEXT NOT NULL,
-	algorithm			TEXT NOT NULL
+	algorithm			algorithm NOT NULL
+);
+
+CREATE TABLE tags (
+	tag_id	BIGSERIAL PRIMARY KEY,
+	-- all lowercase, used as uname
+	tag 	TEXT NOT NULL UNIQUE,
+	-- the capatalization of the tag when initiated
+	-- down the road make admin able to configure
+	-- important for the visually impared or just ease of reading
+	display_name	TEXT NULL,
+	-- defaults to 'boosts follower's posts that contain #tag'
+	-- plan to allow being set to something else by admins
+	bio TEXT NULL,
+	-- used to allow admins to ban tags for moderation purposes 
+	banned BOOLEAN NOT NOT DEFAULT false
 );
 
 CREATE TABLE user_tags (
-
+	-- user follow id (this is the id of this user following this tag)
+	-- this will be used for the ending of the id of the follow request coming from us
 	ufid				uuid NOT NULL UNIQUE,
-	activitypub_id		TEXT NOT NULL UNIQUE,
+	-- used to allow the user to undo following a tag
+	user_follow_activitypub_id		TEXT NOT NULL UNIQUE,
+	follow_back_id					TEXT NOT NULL UNIQUE,
 	-- the user that is following
-	follower		uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+	user		uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
 	-- the user that is being followed
-	target_user		uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+	tag			BIGINT NOT NULL REFERENCES tags(tag_id) ON DELETE CASCADE,
 	published		BIGINT NOT NULL,
 	PRIMARY KEY(follower, target_user)
 );
 
 CREATE TABLE posts (
-	-- pid is generated locally and used by the api to 
-	-- fetch user posts
+	-- pid will be used to create the id of the share activity 
 	pid 		uuid NOT NULL PRIMARY KEY UNIQUE,
+	-- used to deduplicate and allow for users to delete posts
 	activitypub_id		TEXT NOT NULL UNIQUE,
 	domain		TEXT NOT NULL REFERENCES instances(i_id) ON DELETE CASCADE,
-
-	surtype		TEXT NOT NULL,
-	subtype		TEXT NOT NULL,
-	category	TEXT NOT NULL,
-
-	likes		BIGINT NOT NULL DEFAULT 0,
-	boosts		BIGINT NOT NULL DEFAULT 0,
-	reactions	TEXT NULL,
-
-	federation_level	federation_level NOT NULL DEFAULT 'federated',
-	visibility			post_visibility NOT NULL DEFAULT 'public',
-	in_group		uuid NULL REFERENCES groups(group_id) ON DELETE CASCADE,
 	published	BIGINT NOT NULL,
 
 	fetched_at			BIGINT NULL,
 	actor	uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE
 );
 
-CREATE TABLE tags (
-	-- all lowercase, used as uname
-	tag 	TEXT NOT NULL PRIMARY KEY UNIQUE,
-	-- the capatalization of the tag when initiated
-	-- down the road make admin able to configure
-	-- important for the visually impared or just ease of reading
-	display	TEXT NULL,
-	-- defaults to 'boosts follower's posts that contain #tag'
-	-- plan to allow being set to something else by admins
-	bio TEXT NULL
+CREATE TABLE post_tags (
+	pid 		uuid  NOT NULL REFERENCES posts(pid) ON DELETE CASCADE,
+	tag			BIGINT NOT NULL REFERENCES tags(tag_id) ON DELETE CASCADE,
 );

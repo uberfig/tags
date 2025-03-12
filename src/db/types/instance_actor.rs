@@ -1,8 +1,9 @@
-use crate::types::actors::Actor;
+use crate::{cryptography::key::Algorithms, types::actors::Actor};
 
 pub struct InstanceActor {
     pub private_key_pem: String,
     pub public_key_pem: String,
+    pub algorithm: Algorithms,
 }
 
 impl InstanceActor {
@@ -36,6 +37,9 @@ impl InstanceActor {
         //     //     domain: Some(domain.to_string()),
         //     //     liked: Some(links.liked),
         //     // }
+        todo!()
+    }
+    pub fn new(algo: Algorithms) -> Self {
         todo!()
     }
 }

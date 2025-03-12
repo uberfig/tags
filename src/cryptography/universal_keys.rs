@@ -1,13 +1,16 @@
 //! for rsa mastodon uses pkcs1-v1.5 with sha256 as seen:
-//! 
+//!
 //! https://docs.joinmastodon.org/spec/security/#http-sign
 
-
-use super::{digest::{sha256_hash, sha512_hash}, key::{Algorithms, Key, KeyErr, PrivateKey, PublicKey}};
+use super::{
+    digest::{sha256_hash, sha512_hash},
+    key::{Algorithms, Key, KeyErr, PrivateKey, PublicKey},
+};
 use ed25519_dalek::VerifyingKey;
 use rand::rngs::OsRng;
 use rsa::{
-    pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey}, signature::{Keypair, SignerMut}
+    pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey},
+    signature::{Keypair, SignerMut},
 };
 use sha2::Sha256;
 
@@ -51,12 +54,8 @@ impl Key for UniversalPrivate {
 impl PrivateKey for UniversalPrivate {
     fn sign(&mut self, content: &[u8]) -> String {
         match self {
-            UniversalPrivate::RSA(rsa_private_key) => {
-                rsa_private_key.sign(content).to_string()
-            },
-            UniversalPrivate::Ed35519(signing_key) => {
-                signing_key.sign(content).to_string()
-            },
+            UniversalPrivate::RSA(rsa_private_key) => rsa_private_key.sign(content).to_string(),
+            UniversalPrivate::Ed35519(signing_key) => signing_key.sign(content).to_string(),
         }
     }
 
@@ -146,8 +145,7 @@ impl PublicKey for UniversalPublic {
                 let Ok(signature) = rsa::pkcs1v15::Signature::try_from(signature) else {
                     return false;
                 };
-                let verified = rsa_public_key
-                    .verify(plain_content, &signature);
+                let verified = rsa_public_key.verify(plain_content, &signature);
                 verified.is_ok()
             }
             UniversalPublic::Ed35519(verifying_key) => {
@@ -160,7 +158,7 @@ impl PublicKey for UniversalPublic {
                 if verified.is_ok() {
                     return true;
                 }
-                // we do this just in case its hashed with sha256 because things can be messey 
+                // we do this just in case its hashed with sha256 because things can be messey
                 // and we're just going to try our best to support everything
                 let second = sha256_hash(plain_content);
                 let verified = verifying_key.verify_strict(second.as_bytes(), &signature);
