@@ -93,6 +93,16 @@ impl Sesh<'_> {
     }
 }
 
+fn tag_from_row(row: tokio_postgres::Row) -> Tag {
+    Tag {
+        id: row.get("tag_id"),
+        name: row.get("tag"),
+        display_name: row.get("display_name"),
+        bio: row.get("bio"),
+        banned: row.get("banned")
+    }
+}
+
 impl Sesh<'_> {
     pub async fn get_tag(&self, tag: &str) -> Option<Tag> {
         let stmt = r#"
@@ -105,16 +115,54 @@ impl Sesh<'_> {
             .pop();
         match result {
             Some(row) => {
-                if row.get("banned") {
-                    return None;
-                }
-                Some(Tag {
-                    name: row.get("tag"),
-                    display_name: row.get("display_name"),
-                    bio: row.get("bio"),
-                })
+                Some(tag_from_row(row))
             },
             None => None,
         }
+    }
+    pub async fn set_tag_banned(&self, tag_id: i64, banned: bool) -> Result<(), ()> {
+        let stmt = r#"
+            UPSATE tags SET banned = $1 WHERE tag_id = $2;
+        "#;
+        let result = self
+            .query(stmt, &[&banned, &tag_id])
+            .await;
+        match result {
+            Ok(_) => Ok(()),
+            Err(_) => Err(()),
+        }
+    }
+    pub async fn create_tag(&self, tag: &str, banned: bool) -> Tag {
+        let stmt = r#"
+        INSERT INTO tags
+        (tag, banned)
+        VALUES
+        ($1, $2)
+        RETURNING *;
+        "#;
+        let result = self
+            .query(stmt, &[&tag, &banned])
+            .await
+            .expect("failed to create tag")
+            .pop()
+            .expect("creating tag returned nothing");
+        tag_from_row(result)
+    }
+    pub async fn update_tag(&self, tag: &Tag) -> Tag {
+        let stmt = r#"
+        UPDATE tags SET
+        display_name = $1,
+        bio = $2,
+        banned = $3
+        WHERE tag_id = $4
+        RETURNING *;
+        "#;
+        let result = self
+            .query(stmt, &[&tag.display_name, &tag.bio, &tag.banned, &tag.id])
+            .await
+            .expect("failed to update tag")
+            .pop()
+            .expect("updating tag returned nothing");
+        tag_from_row(result)
     }
 }
