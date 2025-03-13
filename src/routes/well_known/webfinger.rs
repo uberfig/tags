@@ -92,7 +92,7 @@ async fn webfinger(
             if !preferred_username.chars().all(char::is_alphanumeric) {
                 return Err(ErrorNotFound("preferred username not alphanumeric"));
             }
-            let tag = conn.get_or_init_tag(&preferred_username).await;
+            let tag = conn.get_or_init_tag(&preferred_username, false).await;
             tag.activitypub_id(&state.instance_domain)
         }
     };

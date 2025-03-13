@@ -10,6 +10,12 @@ pub enum Sesh<'a> {
     Transaction(Transaction<'a>),
 }
 impl Sesh<'_> {
+    pub async fn commit(self) {
+        match self {
+            Sesh::Client(object) => {},
+            Sesh::Transaction(transaction) => transaction.commit().await.expect("failed to commit"),
+        }
+    }
     pub async fn query(
         &self,
         stmt: &str,

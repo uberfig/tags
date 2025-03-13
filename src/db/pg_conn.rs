@@ -1,4 +1,4 @@
-use crate::{cryptography::key::Algorithms, db::pg_sesh::Sesh, types::actors::Actor};
+use crate::{cryptography::key::Algorithms, db::pg_sesh::Sesh};
 use deadpool_postgres::Pool;
 
 use super::types::{instance_actor::InstanceActor, tag::Tag};
@@ -25,6 +25,7 @@ impl PgConn {
         sesh.insert_instance_actor(&new_actor)
             .await
             .expect("failed to insert new instance actor");
+        sesh.commit().await;
         new_actor
     }
     pub async fn get_instance_actor(&self) -> Option<InstanceActor> {
@@ -32,7 +33,18 @@ impl PgConn {
         let sesh = Sesh::Client(client);
         sesh.fetch_instance_actor().await
     }
-    pub async fn get_or_init_tag(&self, tag: &str) -> Tag {
-        todo!()
+    pub async fn get_or_init_tag(&self, tag: &str, banned: bool) -> Tag {
+        let mut client = self.db.get().await.expect("failed to get client");
+        let transaction = client
+            .transaction()
+            .await
+            .expect("failed to begin transaction");
+        let sesh = Sesh::Transaction(transaction);
+        if let Some(tag) = sesh.get_tag(tag).await {
+            return tag;
+        }
+        let tag = sesh.create_tag(tag, banned).await;
+        sesh.commit().await;
+        tag
     }
 }
