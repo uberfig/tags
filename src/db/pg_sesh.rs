@@ -1,7 +1,7 @@
 use deadpool_postgres::{Object, Transaction};
 use tokio_postgres::{types::ToSql, Statement};
 
-use crate::{cryptography::key::Algorithms, types::actors::Actor};
+use crate::cryptography::key::Algorithms;
 
 use super::types::{instance_actor::InstanceActor, tag::Tag};
 
@@ -11,9 +11,8 @@ pub enum Sesh<'a> {
 }
 impl Sesh<'_> {
     pub async fn commit(self) {
-        match self {
-            Sesh::Client(object) => {},
-            Sesh::Transaction(transaction) => transaction.commit().await.expect("failed to commit"),
+        if let Sesh::Transaction(transaction) = self {
+            transaction.commit().await.expect("failed to commit")
         }
     }
     pub async fn query(
