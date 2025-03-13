@@ -1,3 +1,5 @@
+use url::Url;
+
 use crate::{cryptography::key::Algorithms, types::actors::Actor};
 
 pub struct InstanceActor {
@@ -12,6 +14,9 @@ impl InstanceActor {
     }
     pub fn get_key_id(domain: &str) -> String {
         format!("https://{}/{}", domain, domain)
+    }
+    pub fn activitypub_id(_domain: &str) -> Url {
+        todo!()
     }
     pub fn to_actor(&self, _domain: &str) -> Actor {
         //     // let links = instance_actor_links(domain);

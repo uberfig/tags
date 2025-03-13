@@ -1,7 +1,7 @@
 use crate::{cryptography::key::Algorithms, db::pg_sesh::Sesh, types::actors::Actor};
 use deadpool_postgres::Pool;
 
-use super::types::instance_actor::InstanceActor;
+use super::types::{instance_actor::InstanceActor, tag::Tag};
 
 #[derive(Clone, Debug)]
 pub struct PgConn {
@@ -32,7 +32,7 @@ impl PgConn {
         let sesh = Sesh::Client(client);
         sesh.fetch_instance_actor().await
     }
-    pub async fn get_or_init_tag(&self, tag: &str) -> Actor {
+    pub async fn get_or_init_tag(&self, tag: &str) -> Tag {
         todo!()
     }
 }

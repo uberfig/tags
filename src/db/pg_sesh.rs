@@ -39,6 +39,7 @@ impl Sesh<'_> {
     }
 }
 
+// instance actor
 impl Sesh<'_> {
     pub async fn fetch_instance_actor(&self) -> Option<InstanceActor> {
         let stmt = r#"
@@ -103,6 +104,7 @@ fn tag_from_row(row: tokio_postgres::Row) -> Tag {
     }
 }
 
+// tags
 impl Sesh<'_> {
     pub async fn get_tag(&self, tag: &str) -> Option<Tag> {
         let stmt = r#"
@@ -166,3 +168,4 @@ impl Sesh<'_> {
         tag_from_row(result)
     }
 }
+

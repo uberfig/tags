@@ -1,3 +1,5 @@
+use url::Url;
+
 use crate::types::actors::Actor;
 
 pub struct Tag {
@@ -9,7 +11,10 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn to_actor(&self) -> Actor {
+    pub fn to_actor(&self, _domain: &str) -> Actor {
+        todo!()
+    }
+    pub fn activitypub_id(&self, _domain: &str) -> Url {
         todo!()
     }
 }

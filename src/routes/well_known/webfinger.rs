@@ -1,4 +1,4 @@
-use crate::{db::pg_conn::PgConn, types::webfinger::*};
+use crate::{db::{pg_conn::PgConn, types::instance_actor::InstanceActor}, types::webfinger::*};
 use actix_web::{
     error::{ErrorBadRequest, ErrorNotFound},
     get,
@@ -84,20 +84,16 @@ async fn webfinger(
         None => return Err(ErrorBadRequest("no preferred username provided")),
     };
 
-    let actor = match preferred_username.eq("instance.actor") {
+    let activitypub_id = match preferred_username.eq("instance.actor") {
         //is the instance actor
-        true => conn
-            .get_instance_actor()
-            .await
-            .expect("instance actor not init")
-            .to_actor(&state.instance_domain),
+        true => InstanceActor::activitypub_id(&state.instance_domain),
         //not the instance actor
         false => {
             if !preferred_username.chars().all(char::is_alphanumeric) {
                 return Err(ErrorNotFound("preferred username not alphanumeric"));
             }
-            let actor = conn.get_or_init_tag(&preferred_username).await;
-            actor
+            let tag = conn.get_or_init_tag(&preferred_username).await;
+            tag.activitypub_id(&state.instance_domain)
         }
     };
 
@@ -107,22 +103,15 @@ async fn webfinger(
         &state.instance_domain, &preferred_username
     );
 
-    let id = actor.id.as_str();
-
     let webfinger = WebfingerResult {
         subject,
-        aliases: Some(vec![id.to_string(), profile_page.clone()]),
+        aliases: Some(vec![activitypub_id.to_string(), profile_page.clone()]),
         links: vec![
             WebfingerLink {
                 rel: RelWrap::Defined(RelTypes::RelSelf),
                 type_field: TypeWrap::Defined(WebfingerLinkTypes::Activitypub),
-                href: Url::parse(id).unwrap(),
+                href: activitypub_id,
             },
-            // WebfingerLink {
-            //     rel: "self".to_string(),
-            //     type_field: "application/json".to_string(),
-            //     href: format!("{}/versia", id),
-            // },
             WebfingerLink {
                 rel: RelWrap::Defined(RelTypes::ProfilePage),
                 type_field: TypeWrap::Defined(WebfingerLinkTypes::Webpage),
