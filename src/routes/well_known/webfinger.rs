@@ -1,4 +1,7 @@
-use crate::{db::{pg_conn::PgConn, types::instance_actor::InstanceActor}, types::webfinger::*};
+use crate::{
+    db::{pg_conn::PgConn, types::instance_actor::InstanceActor},
+    types::webfinger::*,
+};
 use actix_web::{
     error::{ErrorBadRequest, ErrorNotFound},
     get,

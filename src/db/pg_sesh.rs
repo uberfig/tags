@@ -105,7 +105,7 @@ fn tag_from_row(row: tokio_postgres::Row) -> Tag {
         name: row.get("tag"),
         display_name: row.get("display_name"),
         bio: row.get("bio"),
-        banned: row.get("banned")
+        banned: row.get("banned"),
     }
 }
 
@@ -121,9 +121,7 @@ impl Sesh<'_> {
             .expect("failed to fetch tag")
             .pop();
         match result {
-            Some(row) => {
-                Some(tag_from_row(row))
-            },
+            Some(row) => Some(tag_from_row(row)),
             None => None,
         }
     }
@@ -131,9 +129,7 @@ impl Sesh<'_> {
         let stmt = r#"
             UPSATE tags SET banned = $1 WHERE tag_id = $2;
         "#;
-        let result = self
-            .query(stmt, &[&banned, &tag_id])
-            .await;
+        let result = self.query(stmt, &[&banned, &tag_id]).await;
         match result {
             Ok(_) => Ok(()),
             Err(_) => Err(()),
@@ -173,4 +169,3 @@ impl Sesh<'_> {
         tag_from_row(result)
     }
 }
-
