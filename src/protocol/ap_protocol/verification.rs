@@ -107,9 +107,9 @@ pub async fn verify_post<K: PrivateKey, H: Headers>(
     let object = match object
         .verify(
             &signature.signature_header.key_domain,
-            instance_key_id,
-            instance_private_key,
-            algorithm,
+            // instance_key_id,
+            // instance_private_key,
+            // algorithm,
         )
         .await
     {

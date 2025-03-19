@@ -1,14 +1,12 @@
-#[cfg(feature = "crypto")]
-use super::link::RangeLinkItem;
 use super::{
     create::Create,
     delete::Delete,
     follow_and_response::{Follow, FollowResponse},
     postable::ApPostable,
 };
-use crate::cryptography::key::Algorithms;
-use crate::cryptography::key::PrivateKey;
-use crate::protocol::ap_protocol::fetch::authorized_fetch;
+// use crate::cryptography::key::Algorithms;
+// use crate::cryptography::key::PrivateKey;
+// use crate::protocol::ap_protocol::fetch::authorized_fetch;
 use crate::protocol::errors::FetchErr;
 use serde::{Deserialize, Serialize};
 
@@ -54,12 +52,14 @@ pub enum InboxableVerifyErr {
 }
 
 impl Inboxable {
-    pub async fn verify<K: PrivateKey>(
+    pub async fn verify
+    // <K: PrivateKey>
+    (
         self,
         origin_domain: &str,
-        instance_key_id: &str,
-        instance_private_key: &mut K,
-        algorithm: Algorithms,
+        // instance_key_id: &str,
+        // instance_private_key: &mut K,
+        // algorithm: Algorithms,
     ) -> Result<VerifiedInboxable, InboxableVerifyErr> {
         match self {
             Inboxable::Postable(postable) => match postable.verify(origin_domain) {
