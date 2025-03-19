@@ -1,9 +1,10 @@
 use deadpool_postgres::{Object, Transaction};
 use tokio_postgres::{types::ToSql, Statement};
+use url::Url;
 
-use crate::cryptography::key::Algorithms;
+use crate::{cryptography::key::Algorithms, types::actors::Actor};
 
-use super::types::{instance_actor::InstanceActor, tag::Tag};
+use super::types::{instance_actor::InstanceActor, tag::Tag, user::User};
 
 pub enum Sesh<'a> {
     Client(Object),
@@ -167,5 +168,21 @@ impl Sesh<'_> {
             .pop()
             .expect("updating tag returned nothing");
         tag_from_row(result)
+    }
+}
+
+//users
+impl Sesh<'_> {
+    pub async fn get_user(&self, username: &str, domain: &Url) -> Option<User> {
+        todo!()
+    }
+    pub async fn create_user(&self, actor: Actor, banned: bool) -> User {
+        todo!()
+    }
+    pub async fn update_user(&self, user: User) -> User {
+        todo!()
+    }
+    pub async fn delete_user(&self, user: User) {
+        
     }
 }

@@ -21,10 +21,9 @@ CREATE TABLE users (
 	domain				TEXT NOT NULL REFERENCES instances(domain) ON DELETE CASCADE,
 	username			TEXT NOT NULL,
 	display_name		TEXT NULL,
-	summary				TEXT NULL, -- used as a user's bio
+
 	public_key_pem		TEXT NOT NULL,
 	public_key_id		TEXT NOT NULL,
-	manual_followers	BOOLEAN NOT NULL DEFAULT false, -- manually approves followers
 
 	banned				BOOLEAN NOT NULL DEFAULT false,
 	reason				TEXT NULL,
@@ -34,6 +33,11 @@ CREATE TABLE users (
 	followers			TEXT NOT NULL,
 	following			TEXT NOT NULL,
 	fetched_at			BIGINT NULL,
+
+	-- admins and moderators will be able to ping the special moderation account to perform actions
+	-- support for sign on with mastodon for dashboard planned
+	is_admin			BOOLEAN NOT NULL DEFAULT false,
+	site_moderator		BOOLEAN NOT NULL DEFAULT false,
 
 	UNIQUE (domain, username)
 );

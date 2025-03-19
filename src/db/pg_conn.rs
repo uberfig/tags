@@ -1,5 +1,6 @@
 use crate::{cryptography::key::Algorithms, db::pg_sesh::Sesh};
 use deadpool_postgres::Pool;
+use url::Url;
 
 use super::types::{instance_actor::InstanceActor, tag::Tag};
 
@@ -46,5 +47,9 @@ impl PgConn {
         let tag = sesh.create_tag(tag, banned).await;
         sesh.commit().await;
         tag
+    }
+    /// backfills users if they are not already present in the db
+    pub async fn get_or_init_user(&self, username: &str, domain: &Url) {
+        
     }
 }
