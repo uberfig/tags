@@ -1,9 +1,9 @@
 use crate::{
     cryptography::key::{Algorithms, PrivateKey},
-    db::pg_sesh::Sesh, protocol::{ap_protocol::fetch::{authorized_fetch, webfinger_actor}, errors::FetchErr, webfinger_resolve::webfinger_resolve}, types::actors::Actor,
+    db::pg_sesh::Sesh,
+    protocol::{ap_protocol::fetch::webfinger_actor, errors::FetchErr},
 };
 use deadpool_postgres::Pool;
-use url::Url;
 
 use super::types::{instance_actor::InstanceActor, tag::Tag, user::User};
 

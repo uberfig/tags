@@ -1,6 +1,5 @@
 use deadpool_postgres::{Object, Transaction};
 use tokio_postgres::{types::ToSql, Statement};
-use url::Url;
 
 use crate::{cryptography::key::Algorithms, types::actors::Actor};
 

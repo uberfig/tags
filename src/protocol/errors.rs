@@ -49,8 +49,8 @@ impl std::fmt::Display for VerifyRequestErr {
             VerifyRequestErr::MissingHeader(x) => write!(f, "MissingHeader: {}", x),
             VerifyRequestErr::InvalidTimestamp => write!(f, "InvalidTimestamp"),
             VerifyRequestErr::SignatureVerificationFailure => {
-                        write!(f, "SignatureVerificationFailure")
-                    }
+                write!(f, "SignatureVerificationFailure")
+            }
             VerifyRequestErr::TooOld => write!(f, "TooOld"),
             VerifyRequestErr::UnableToObtainKey => write!(f, "UnableToObtainKey"),
             VerifyRequestErr::InvalidSigner => write!(f, "InvalidSigner"),
