@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::time::SystemTime;
 use url::Url;
 
-use crate::cryptography::key::{Algorithms, PrivateKey};
+use crate::{cryptography::key::{Algorithms, PrivateKey}, protocol::{errors::VerifyRequestErr, webfinger_resolve::webfinger_resolve}, types::actors::Actor};
 
 /// key_id and private_key are the properties of the key
 /// being used to perform the fetch. usually done by the
@@ -124,4 +124,41 @@ pub async fn ap_post<T: PrivateKey>(
             res.text().await.unwrap_or("".to_string())
         )));
     }
+}
+
+pub async fn webfinger_actor<T: PrivateKey>(
+    key_id: &str,
+    private_key: &mut T,
+    username: &str,
+    domain: &str,
+) -> Result<Actor, FetchErr> {
+    let resolve = webfinger_resolve(username, domain).await;
+        let resolve = match resolve {
+            Ok(ok) => ok,
+            Err(err) => return Err(err),
+        };
+        let Some(resolve) = resolve.get_self() else {
+            return Err(FetchErr::MissingField("Self".to_string()));
+        };
+        if resolve.domain().ne(&Some(domain)) {
+            return Err(FetchErr::VerifyErr(VerifyRequestErr::NoAuthority));
+        }
+
+        let fetched: Result<Actor, FetchErr> = authorized_fetch(
+            resolve.clone(),
+            key_id,
+            private_key,
+        )
+        .await;
+
+        let fetched = match fetched {
+            Ok(ok) => ok,
+            Err(err) => return Err(err),
+        };
+
+        if fetched.id.domain().ne(&Some(domain)) {
+            return Err(FetchErr::VerifyErr(VerifyRequestErr::NoAuthority));
+        }
+
+        todo!()
 }

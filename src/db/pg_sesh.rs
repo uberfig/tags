@@ -173,7 +173,7 @@ impl Sesh<'_> {
 
 //users
 impl Sesh<'_> {
-    pub async fn get_user(&self, username: &str, domain: &Url) -> Option<User> {
+    pub async fn get_user(&self, username: &str, domain: &str) -> Option<User> {
         todo!()
     }
     pub async fn create_user(&self, actor: Actor, banned: bool) -> User {

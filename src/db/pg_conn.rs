@@ -1,6 +1,6 @@
 use crate::{
     cryptography::key::{Algorithms, PrivateKey},
-    db::pg_sesh::Sesh, protocol::{ap_protocol::fetch::authorized_fetch, errors::FetchErr, webfinger_resolve::webfinger_resolve}, types::actors::Actor,
+    db::pg_sesh::Sesh, protocol::{ap_protocol::fetch::{authorized_fetch, webfinger_actor}, errors::FetchErr, webfinger_resolve::webfinger_resolve}, types::actors::Actor,
 };
 use deadpool_postgres::Pool;
 use url::Url;
@@ -55,8 +55,9 @@ impl PgConn {
     pub async fn get_or_init_user<T: PrivateKey>(
         &self,
         username: &str,
-        domain: &Url,
+        domain: &str,
         private_key: &mut T,
+        instance_key_id: &str,
     ) -> Result<User, FetchErr> {
         let mut client = self.db.get().await.expect("failed to get client");
         let transaction = client
@@ -68,24 +69,11 @@ impl PgConn {
             return Ok(user);
         }
         // ---------------- backfill ------------------
-        let resolve = webfinger_resolve(username, domain.as_str()).await;
-        let resolve = match resolve {
-            Ok(ok) => ok,
-            Err(err) => return Err(err),
-        };
-        let Some(resolve) = resolve.get_self() else {
-            return Err(FetchErr::MissingField("Self".to_string()));
-        };
+        let actor = webfinger_actor(instance_key_id, private_key, username, domain).await?;
 
-        let fetched: Result<Actor, FetchErr> = authorized_fetch(
-            signature.signature_header.key_id.clone(),
-            instance_key_id,
-            instance_private_key,
-        )
-        .await;
+        let user = sesh.create_user(actor, false).await;
 
         sesh.commit().await;
-
-        todo!()
+        Ok(user)
     }
 }
