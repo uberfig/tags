@@ -76,7 +76,6 @@ pub async fn verify_post<K: PrivateKey, H: Headers>(
         signature.signature_header.key_id.clone(),
         instance_key_id,
         instance_private_key,
-        algorithm,
     )
     .await;
 
@@ -126,7 +125,6 @@ pub async fn verify_get<K: PrivateKey, H: Headers>(
     instance_domain: &str,
     instance_key_id: &str,
     instance_private_key: &mut K,
-    algorithm: Algorithms,
 ) -> Result<(), RequestVerificationError> {
     //get the signature header
     let Some(signature_header) = request_headers.get("Signature") else {
@@ -146,7 +144,6 @@ pub async fn verify_get<K: PrivateKey, H: Headers>(
         signature.signature_header.key_id.clone(),
         instance_key_id,
         instance_private_key,
-        algorithm,
     )
     .await;
 

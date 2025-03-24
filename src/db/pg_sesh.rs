@@ -182,7 +182,5 @@ impl Sesh<'_> {
     pub async fn update_user(&self, user: User) -> User {
         todo!()
     }
-    pub async fn delete_user(&self, user: User) {
-        
-    }
+    pub async fn delete_user(&self, user: User) {}
 }

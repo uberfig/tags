@@ -52,9 +52,7 @@ pub enum InboxableVerifyErr {
 }
 
 impl Inboxable {
-    pub async fn verify
-    // <K: PrivateKey>
-    (
+    pub async fn verify(
         self,
         origin_domain: &str,
         // instance_key_id: &str,

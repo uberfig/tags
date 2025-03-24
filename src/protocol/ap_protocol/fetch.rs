@@ -13,8 +13,8 @@ pub async fn authorized_fetch<T: PrivateKey, F: for<'a> Deserialize<'a>>(
     object_id: Url,
     key_id: &str,
     private_key: &mut T,
-    algorithm: Algorithms,
 ) -> Result<F, FetchErr> {
+    let algorithm = private_key.algorithm();
     let path = object_id.path();
     let Some(fetch_domain) = object_id.host_str() else {
         return Err(FetchErr::InvalidUrl(object_id.as_str().to_string()));

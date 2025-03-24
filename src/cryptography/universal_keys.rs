@@ -49,6 +49,13 @@ impl Key for UniversalPrivate {
             },
         }
     }
+
+    fn algorithm(&self) -> Algorithms {
+        match self {
+            UniversalPrivate::RSA(_) => Algorithms::RsaSha256,
+            UniversalPrivate::Ed35519(_) => Algorithms::Hs2019,
+        }
+    }
 }
 
 impl PrivateKey for UniversalPrivate {
@@ -132,6 +139,13 @@ impl Key for UniversalPublic {
                     Err(_) => todo!(),
                 }
             }
+        }
+    }
+
+    fn algorithm(&self) -> Algorithms {
+        match self {
+            UniversalPublic::RSA(_) => Algorithms::RsaSha256,
+            UniversalPublic::Ed35519(_) => Algorithms::Hs2019,
         }
     }
 }

@@ -1,10 +1,7 @@
 use reqwest::StatusCode;
 use url::Url;
 
-use crate::protocol::{
-    errors::FetchErr,
-    webfinger::RelWrap,
-};
+use crate::protocol::{errors::FetchErr, webfinger::RelWrap};
 
 use super::webfinger::WebfingerResult;
 
@@ -17,8 +14,8 @@ pub struct WebfingerInfo {
 pub async fn webfinger_resolve(
     username: &str,
     domain: &str,
-    rel: RelWrap,
-) -> Result<Url, FetchErr> {
+    // rel: RelWrap,
+) -> Result<WebfingerResult, FetchErr> {
     let query = format!("https://{domain}/.well-known/webfinger?resource=acct:{username}@{domain}");
     let query = Url::parse(&query).expect("generated invalid url for webfinger resolve");
 
@@ -42,12 +39,13 @@ pub async fn webfinger_resolve(
                 Ok(ok) => ok,
                 Err(err) => return Err(FetchErr::DeserializationErr(err.to_string())),
             };
-            for link in val.links {
-                if link.rel == rel {
-                    return Ok(link.href);
-                }
-            }
-            return Err(FetchErr::MissingField(rel.to_string()));
+            // for link in val.links {
+            //     if link.rel == rel {
+            //         return Ok(link.href);
+            //     }
+            // }
+            // return Err(FetchErr::MissingField(rel.to_string()));
+            Ok(val)
         }
         StatusCode::NOT_FOUND => Err(FetchErr::NotFound()),
         _ => Err(FetchErr::RequestErr(format!(

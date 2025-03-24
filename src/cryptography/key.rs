@@ -63,6 +63,7 @@ pub trait Key: Sized {
     /// Serialize self to PEM.
     /// if a public key this will be the public pem
     fn to_pem(&self) -> Result<String, KeyErr>;
+    fn algorithm(&self) -> Algorithms;
 }
 
 pub trait PrivateKey: Key + Clone {

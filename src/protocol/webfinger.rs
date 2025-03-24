@@ -10,6 +10,20 @@ pub struct WebfingerResult {
     pub links: Vec<WebfingerLink>,
 }
 
+impl WebfingerResult {
+    pub fn get_field(&self, rel: RelWrap) -> Option<&Url> {
+        for link in &self.links {
+            if link.rel == rel {
+                return Some(&link.href);
+            }
+        }
+        None
+    }
+    pub fn get_self(&self) -> Option<&Url> {
+        self.get_field(RelWrap::Defined(RelTypes::RelSelf))
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WebfingerLink {
     pub rel: RelWrap,
