@@ -71,7 +71,7 @@ impl PgConn {
         // ---------------- backfill ------------------
         let actor = webfinger_actor(instance_key_id, private_key, username, domain).await?;
 
-        let user = sesh.create_user(actor, false).await;
+        let user = sesh.create_user(actor, false, None).await;
 
         sesh.commit().await;
         Ok(user)

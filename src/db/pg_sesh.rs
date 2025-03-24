@@ -1,9 +1,11 @@
 use deadpool_postgres::{Object, Transaction};
 use tokio_postgres::{types::ToSql, Statement};
+use url::Url;
+use uuid::Uuid;
 
 use crate::{cryptography::key::Algorithms, types::actors::Actor};
 
-use super::types::{instance_actor::InstanceActor, tag::Tag, user::User};
+use super::types::{instance::Instance, instance_actor::InstanceActor, tag::Tag, user::User};
 
 pub enum Sesh<'a> {
     Client(Object),
@@ -175,11 +177,48 @@ impl Sesh<'_> {
     pub async fn get_user(&self, username: &str, domain: &str) -> Option<User> {
         todo!()
     }
-    pub async fn create_user(&self, actor: Actor, banned: bool) -> User {
+    pub async fn create_user(&self, actor: Actor, banned: bool, reason: Option<String>) -> User {
         todo!()
     }
     pub async fn update_user(&self, user: User) -> User {
         todo!()
     }
-    pub async fn delete_user(&self, user: User) {}
+    pub async fn delete_user(&self, user: User) {
+        todo!()
+    }
+    pub async fn set_user_banned(&self, user: &User, banned: bool, reason: Option<String>) {
+        todo!()
+    }
+}
+
+impl Sesh<'_> {
+    pub async fn create_following(&self, user: &User, tag: &Tag, activitypub_id: Url) -> Uuid {
+        todo!()
+    }
+    pub async fn undo_following(&self, activitypub_id: Url) {
+
+    }
+    pub async fn tag_followers(&self, tag: &Tag) -> Vec<User> {
+        todo!()
+    }
+    pub async fn tag_unique_inboxes(&self, tag: &Tag) -> Vec<Url> {
+        todo!()
+    }
+}
+
+impl Sesh<'_> {
+    pub async fn create_instance(&self, domain: &str, banned: bool, reason: Option<String>, allowlist: bool) -> Instance {
+        todo!()
+    }
+    /// ban an istance without severing any connections or deleting data, will pause any future following
+    /// and any incoming and outgoing traffic to this instance will stop
+    /// 
+    /// to delete and ban, create a transaction and use [`Sesh::delete_instance`] and then [`Sesh::create_instance`] 
+    /// with banned set to true
+    pub async fn set_instance_banned(&self, instance: Instance, banned: bool, reason: Option<String>) {
+        todo!()
+    }
+    pub async fn delete_instance(&self, instance: Instance) {
+        todo!()
+    }
 }

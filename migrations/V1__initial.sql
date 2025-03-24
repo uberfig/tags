@@ -6,11 +6,7 @@ CREATE TABLE instances (
 	blocked			BOOLEAN NOT NULL DEFAULT false,
 	reason			TEXT NULL,
 	allowlisted		BOOLEAN NOT NULL DEFAULT false,
-	-- used to denote our instance
-	main			BOOLEAN NOT NULL DEFAULT false
 );
-create unique index on instances (main) 
-where main = true;
 
 CREATE TABLE users (
 	-- we will generate a uuid for all users
@@ -29,6 +25,9 @@ CREATE TABLE users (
 	reason				TEXT NULL,
 
 	inbox				TEXT NOT NULL,
+	-- if shared inbox is null in the actor then set the shared inbox to be the inbox
+	-- we do this just because then we can have an easy select distinct on it
+	shared_inbox		TEXT NOT NULL,
 	outbox				TEXT NOT NULL,
 	followers			TEXT NOT NULL,
 	following			TEXT NOT NULL,
@@ -70,7 +69,6 @@ CREATE TABLE user_tags (
 	ufid				uuid NOT NULL UNIQUE,
 	-- used to allow the user to undo following a tag
 	user_follow_activitypub_id		TEXT NOT NULL UNIQUE,
-	follow_back_id					TEXT NOT NULL UNIQUE,
 	-- the user that is following
 	user		uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
 	-- the user that is being followed
