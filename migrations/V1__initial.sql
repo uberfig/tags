@@ -92,4 +92,5 @@ CREATE TABLE posts (
 CREATE TABLE post_tags (
 	pid 		uuid  NOT NULL REFERENCES posts(pid) ON DELETE CASCADE,
 	tag			BIGINT NOT NULL REFERENCES tags(tag_id) ON DELETE CASCADE,
+	PRIMARY KEY(pid, tag)
 );

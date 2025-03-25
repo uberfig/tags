@@ -101,16 +101,6 @@ impl Sesh<'_> {
     }
 }
 
-fn tag_from_row(row: tokio_postgres::Row) -> Tag {
-    Tag {
-        id: row.get("tag_id"),
-        name: row.get("tag"),
-        display_name: row.get("display_name"),
-        bio: row.get("bio"),
-        banned: row.get("banned"),
-    }
-}
-
 // tags
 impl Sesh<'_> {
     pub async fn get_tag(&self, tag: &str) -> Option<Tag> {
@@ -123,7 +113,7 @@ impl Sesh<'_> {
             .expect("failed to fetch tag")
             .pop();
         match result {
-            Some(row) => Some(tag_from_row(row)),
+            Some(row) => Some(row.into()),
             None => None,
         }
     }
@@ -151,7 +141,7 @@ impl Sesh<'_> {
             .expect("failed to create tag")
             .pop()
             .expect("creating tag returned nothing");
-        tag_from_row(result)
+        result.into()
     }
     pub async fn update_tag(&self, tag: &Tag) -> Tag {
         let stmt = r#"
@@ -168,7 +158,7 @@ impl Sesh<'_> {
             .expect("failed to update tag")
             .pop()
             .expect("updating tag returned nothing");
-        tag_from_row(result)
+        result.into()
     }
 }
 
@@ -195,6 +185,20 @@ impl Sesh<'_> {
     pub async fn create_following(&self, user: &User, tag: &Tag, activitypub_id: Url) -> Uuid {
         todo!()
     }
+    pub async fn get_following(&self, user: &User, tag: &Tag) -> Option<Uuid> {
+        let stmt = r#"
+            SELECT * FROM user_tags WHERE user = $1 AND tag = $2;
+        "#;
+        let result = self
+            .query(stmt, &[&user.id, &tag.id])
+            .await
+            .expect("failed to fetch tag")
+            .pop();
+        match result {
+            Some(row) => Some(row.get("ufid")),
+            None => None,
+        }
+    }
     pub async fn undo_following(&self, activitypub_id: Url) {
 
     }
@@ -208,6 +212,9 @@ impl Sesh<'_> {
 
 impl Sesh<'_> {
     pub async fn create_instance(&self, domain: &str, banned: bool, reason: Option<String>, allowlist: bool) -> Instance {
+        todo!()
+    }
+    pub async fn get_instance(&self, domain: &str) -> Option<Instance> {
         todo!()
     }
     /// ban an istance without severing any connections or deleting data, will pause any future following

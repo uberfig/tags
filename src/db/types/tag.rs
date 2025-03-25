@@ -18,3 +18,15 @@ impl Tag {
         todo!()
     }
 }
+
+impl From<tokio_postgres::Row> for Tag {
+    fn from(row: tokio_postgres::Row) -> Self {
+        Tag {
+            id: row.get("tag_id"),
+            name: row.get("tag"),
+            display_name: row.get("display_name"),
+            bio: row.get("bio"),
+            banned: row.get("banned"),
+        }
+    }
+}
